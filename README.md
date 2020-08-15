@@ -120,7 +120,7 @@ load data local inpath '/home/rahul/Desktop/file' into table part_Dept partition
 Hive figures out the partitioning by itself. We just need to provide the column name to it. Also to enable dynamic partitioning we need to use the following command - 
 ```
 SET hive.exec.dynamic.partition=true;
-SET hive.exec.dynamic.partition.mode=unstrict;
+SET hive.exec.dynamic.partition.mode=nonstrict;
 ```
 #### Creating a table first
 ```SQL
@@ -139,12 +139,20 @@ A bucket is usually another way of organising data in Hive. A partition contains
 
 ![](https://i.ibb.co/dDwLhQ6/Screenshot-2020-08-16-at-1-18-27-AM.png)
 
+Which record goes to which bucket is determined using Hashing.
 
+To enable bucketing, use the following command - 
+```
+SET hive.enforce.bucketing = true;
+SET hive.exec.dynamic.parition.mode = nonstrict;
+```
 
+## Joins in Hive
+Joins work pretty much the same like SQL.
+1. Inner joins - Only matching rows are selected from 2 tables.
+```SQL
 
-
-
-
+```
 
 
 
