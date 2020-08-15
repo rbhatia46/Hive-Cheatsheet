@@ -30,6 +30,8 @@ Tables are of 2 types in Hive -
 * Dropping Internal Table - Both metadata and table data are losr
 * Dropping External Table - Only metadata is lost.
 
+**Internal tables are less secure.**
+
 By default, Hive creates Internal Table.
 ```sql
 CREATE TABLE IF NOT EXISTS table1(col1 string, col2 array<string>, col3 string, col4 int) row format delimited fields terminated by ',' collection items terminated by ':' lines terminated by '\n' stored as parquet location '/user/rahul/table1'
