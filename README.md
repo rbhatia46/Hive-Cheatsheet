@@ -24,13 +24,18 @@ USE db;
 
 ## Creating Tables 
 Tables are of 2 types in Hive - 
-1. External - Hive is only responsible for metadata, this can be accessed by other applications aligned with HDFS security.
-2. Internal - Hive is the sole owner of metadata and table's data, data can only be accessed using Hive.
+1. **External** - Hive is only responsible for metadata, this can be accessed by other applications aligned with HDFS security.
+2. **Internal/Managed** - Hive is the sole owner of metadata and table's data, data can only be accessed using Hive.
 
 * Dropping Internal Table - Both metadata and table data are losr
 * Dropping External Table - Only metadata is lost.
 
 **Internal tables are less secure.**
+
+## Describing table details
+```SQL
+DESCRIBE formatted table1;
+```
 
 By default, Hive creates Internal Table.
 ```sql
@@ -88,3 +93,58 @@ CREATE TABLE HRs(id int, name string, desg string)
 ```SQL
 FROM Employees INSERT INTO TABLE Developers SELECT col1,col2,col3 WHERE col3='Developer' INSERT INTO TABLE Managers SELECT col1,col2,col3 WHERE col3='Manager' INSERT INTO TABLE HRs SELECT col1,col2,col3 WHERE col3='HR' 
 ```
+
+## Partitions and Buckets in Hive
+
+Partitioning data into various directories - avoid full table scans when we need information only about a particular types of entity.
+Hive has 2 types of partitions - 
+**1. Static** - 
+Manually define the partitions and everything
+
+#### Creating a table first
+```SQL
+CREATE TABLE IF NOT EXISTS part_dept(deptno int, empname string, salary int) partitioned by (deptname string) row format delimited fields terminated by ',' lines terminated by '\n'stored as textfile
+```
+
+#### Inserting data into table using static partitioning
+```SQL
+INSERT INTO TABLE part_dept partition(deptname='HR') select col1,col3,col4 from dept where col2='HR';
+```
+
+## Loading data from external file in a particular partition
+```SQL
+load data local inpath '/home/rahul/Desktop/file' into table part_Dept partition(deptname='HR');
+```
+
+**2. Dynamic** - 
+Hive figures out the partitioning by itself. We just need to provide the column name to it. Also to enable dynamic partitioning we need to use the following command - 
+```
+SET hive.exec.dynamic.partition=true;
+SET hive.exec.dynamic.partition.mode=unstrict;
+```
+#### Creating a table first
+```SQL
+CREATE TABLE IF NOT EXISTS part_dept1(deptno int, empname string, salary int) partitioned by (deptname string) row format delimited fields terminated by ',' lines terminated by '\n'stored as textfile;
+```
+#### Inserting data into table using dynamic partitioning
+```SQL
+INSERT INTO TABLE part_dept1 partition(deptname) select col1,col3,col4 col2 from dept;
+```
+**Note that Hive creates a seperate partition for each unique row in col2.**
+
+
+A bucket is usually another way of organising data in Hive. A partition contains many buckets.
+
+**Static Partitioning is fast of course, as we provide everything beforehand to Hive, and static is good when we have prior knowledge about our data, and there are not many unique values on the column on which we partition.**
+
+![](https://i.ibb.co/dDwLhQ6/Screenshot-2020-08-16-at-1-18-27-AM.png)
+
+
+
+
+
+
+
+
+
+
